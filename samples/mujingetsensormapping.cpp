@@ -60,6 +60,28 @@ inline unsigned long long GetMilliTime()
 using namespace mujinclient;
 
 #include <boost/program_options.hpp>
+#include <boost/thread.hpp>
+
+void TestThread(SceneResourcePtr scene, int id)
+{
+    try {
+        //std::cout << id << " " << GetMilliTime() << std::endl;
+        std::map<std::string, std::string> mAllCameraNameHardwareId; // mapping of all the cameras, even ones that are not used
+        scene->GetSensorMapping(mAllCameraNameHardwareId);
+        //std::cout << id << " " << GetMilliTime() << " mAllCameraNameHardwareId.size()=" << mAllCameraNameHardwareId.size() << std::endl;
+        std::cout << mAllCameraNameHardwareId.size() << std::endl;
+    }
+    catch(const std::exception& ex) {
+        std::stringstream errss;
+        errss << "Caught exception " << ex.what();
+        std::cerr << errss.str() << std::endl;
+    }
+    catch (...) {
+        std::stringstream errss;
+        errss << "Caught unknown exception!";
+        std::cerr << errss.str() << std::endl;
+    }
+}
 
 
 int main(int argc, char ** argv)
@@ -76,18 +98,7 @@ int main(int argc, char ** argv)
         ("controller_command_timeout", bpo::value<double>()->default_value(10), "command timeout in seconds, e.g. 10")
         ("locale", bpo::value<std::string>()->default_value("en_US"), "locale to use for the mujin controller client")
         ("binpicking_task_scenepk", bpo::value<std::string>()->required(), "scene pk of the binpicking task on the mujin controller, e.g. officeboltpicking.mujin.dae")
-        ("taskparameters", bpo::value<std::string>()->required(), "binpicking task parameters, e.g. {'robotname': 'robot', 'robots':{'robot': {'externalCollisionIO':{}, 'gripperControlInfo':{}, 'robotControllerUri': '', robotDeviceIOUri': '', 'toolname': 'tool'}}}")
-        ("slaverequestid", bpo::value<std::string>()->required(), "slaverequestid, e.g. hostname_slave0")
-        ("robotname", bpo::value<std::string>()->required(), "robot name, e.g. VS060A3-AV6-NNN-NNN")
-        ("regionname", bpo::value<std::string>()->required(), "regionname, e.g. smallcontainer")
-        ("objectupdatename", bpo::value<std::string>()->required(), "target object name, e.g. detected")
-        ("objecturi", bpo::value<std::string>()->required(), "target object uri, e.g. mujin:/bolt0.mujin.dae")
-        ("objectconfidence", bpo::value<std::string>()->default_value("{\"global_confidence\":1.0}"), "target object confidence")
-        ("objectextra", bpo::value<std::string>()->default_value(""), "target object extras, e.g. {\"randombox\": {\"height\":100,\"width\":100,\"length\":100}}")
-        ("waitinterval", bpo::value<unsigned int>()->default_value(500), "update interval in ms")
-        ("pointsfilename", bpo::value<std::string>()->required(), "path to text file containing commaseparated point xyz positions in millimeter")
-        ("pointsize", bpo::value<double>()->default_value(0.005), "pointcloud pointsize in millimeter")
-        ("obstaclename", bpo::value<std::string>()->default_value("__dynamicobstacle__"), "pointcloud obstacle name")
+        ("n", bpo::value<unsigned int>()->default_value(1))
     ;
 
     bpo::variables_map opts;
@@ -112,27 +123,19 @@ int main(int argc, char ** argv)
     const double controllerCommandTimeout = opts["controller_command_timeout"].as<double>();
     const std::string binpickingTaskScenePk = opts["binpicking_task_scenepk"].as<std::string>();
     const std::string locale = opts["locale"].as<std::string>();
-
+    const unsigned int n = opts["n"].as<unsigned int>();
     std::string tasktype = "binpicking";
-    try {
-        // connect to mujin controller
-        std::stringstream url_ss;
-        url_ss << "http://"<< controllerIp << ":" << controllerPort;
-        ControllerClientPtr controllerclient = CreateControllerClient(controllerUsernamePass, url_ss.str());
-        SceneResourcePtr scene(new SceneResource(controllerclient, binpickingTaskScenePk));
-        std::map<std::string, std::string> mAllCameraNameHardwareId; // mapping of all the cameras, even ones that are not used
-        scene->GetSensorMapping(mAllCameraNameHardwareId);
-        std::cout << "mAllCameraNameHardwareId.size()=" << mAllCameraNameHardwareId.size() << std::endl;
-        //boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+    std::stringstream url_ss;
+    url_ss << "http://"<< controllerIp << ":" << controllerPort;
+    std::string url = url_ss.str();
+    boost::thread t0, t1;
+    ControllerClientPtr controllerclient = CreateControllerClient(controllerUsernamePass, url);
+    SceneResourcePtr scene(new SceneResource(controllerclient, binpickingTaskScenePk));
+    ControllerClientPtr controllerclient1 = CreateControllerClient(controllerUsernamePass, url);
+    SceneResourcePtr scene1(new SceneResource(controllerclient, binpickingTaskScenePk));
+    boost::thread_group threads;
+    for (int i = 0; i < n; ++i) {
+        threads.create_thread(boost::bind(&TestThread, scene, i));
     }
-    catch(const std::exception& ex) {
-        std::stringstream errss;
-        errss << "Caught exception " << ex.what();
-        std::cerr << errss.str() << std::endl;
-    }
-    catch (...) {
-        std::stringstream errss;
-        errss << "Caught unknown exception!";
-        std::cerr << errss.str() << std::endl;
-    }
+    threads.join_all();
 }
