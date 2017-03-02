@@ -14,6 +14,8 @@
 include_directories(${MUJINCLIENT_INCLUDE_LOCAL_DIRS})
 link_directories(${MUJINCLIENT_LINK_DIRS})
 
+add_subdirectory(controllerclientmock)
+
 macro(build_test name)
   include_directories(${LOG4CXX_INCLUDEDIR})
   link_directories(${LOG4CXX_LIBDIR})
