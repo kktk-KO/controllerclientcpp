@@ -56,6 +56,7 @@ set( MujinControllerClient_LINK_FLAGS "@MUJINCLIENT_LOG4CXX_LIB_DIRS@" )
 set( MujinControllerClient_INCLUDE_DIRS "${MujinControllerClient_ROOT_DIR}/include")
 set( MujinControllerClient_LIBRARY_DIRS "${MujinControllerClient_ROOT_DIR}/lib@LIB_SUFFIX@")
 set( MujinControllerClient_LIBRARIES mujincontrollerclient${MujinControllerClient_LIBRARY_SUFFIX} @LOG4CXX_LIBRARIES@)
+set( MujinControllerClientMock_LIBRARIES mujincontrollerclientmock${MujinControllerClient_LIBRARY_SUFFIX} @LOG4CXX_LIBRARIES@)
 
 set( MujinControllerClient_Boost_VERSION "@Boost_MAJOR_VERSION@.@Boost_MINOR_VERSION@")
 
