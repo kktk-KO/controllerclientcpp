@@ -11,17 +11,22 @@
 #include <mujincontrollerclient/mujincontrollerclient.h>
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/function.hpp>
 
 namespace mujinclient {
 
+/// \brief ControllerClientMock is expected to be signleton for now.
+///  in order to get reference to the singleton, use GetControllerClientMockPtr.
 class ControllerClientMock : public ControllerClient, public boost::enable_shared_from_this<ControllerClientMock>
 {
 public:
-    ControllerClientMock(const std::string& usernamepassword, const std::string& baseuri, const std::string& proxyserverport, const std::string& proxyuserpw, int options, double timeout);
+    ControllerClientMock();
     virtual ~ControllerClientMock();
 
     // controller client interface
 
+    /// this method is the customization point for CreateControllerClient.
+    void ControllerClientConstructor(const std::string& usernamepassword, const std::string& baseurl, const std::string& proxyserverport, const std::string& proxyuserpw, int options, double timeout);
     void SetCharacterEncoding(const std::string& newencoding);
     const std::string& GetUserName() const;
     void SetLanguage(const std::string& language);
@@ -52,10 +57,10 @@ public:
     void DeleteFileOnController_UTF16(const std::wstring& desturi);
     void DeleteDirectoryOnController_UTF8(const std::string& desturi);
     void DeleteDirectoryOnController_UTF16(const std::wstring& desturi);
-    virtual void SetDefaultSceneType(const std::string& scenetype);
-    virtual const std::string& GetDefaultSceneType();
-    virtual void SetDefaultTaskType(const std::string& tasktype);
-    virtual const std::string& GetDefaultTaskType();
+    void SetDefaultSceneType(const std::string& scenetype);
+    const std::string& GetDefaultSceneType();
+    void SetDefaultTaskType(const std::string& tasktype);
+    const std::string& GetDefaultTaskType();
     std::string GetScenePrimaryKeyFromURI_UTF8(const std::string& uri);
     std::string GetScenePrimaryKeyFromURI_UTF16(const std::wstring& uri);
     std::string GetPrimaryKeyFromName_UTF8(const std::string& name);
@@ -65,12 +70,54 @@ public:
 
     // controller client mock interface
 
-private:
-    std::string _dummy;
-    std::wstring _wdummy;
+    boost::function<void(const std::string&, const std::string&, const std::string&, const std::string&, int, double)> handler_ControllerClientConstructor;
+    boost::function<void(const std::string&)> handler_SetCharacterEncoding;
+    boost::function<const std::string&()> handler_GetUserName;
+    boost::function<void(const std::string&)> handler_SetLanguage;
+    boost::function<void(const std::string&, const std::string&)> handler_SetProxy;
+    boost::function<void(double)> handler_RestartServer;
+    boost::function<void(const std::vector<unsigned char>&)> handler_Upgrade;
+    boost::function<std::string()> handler_GetVersion;
+    boost::function<void()> handler_CancelAllJobs;
+    boost::function<void(std::vector<JobStatus>&, int)> handler_GetRunTimeStatuses;
+    boost::function<void(std::vector<std::string>&)> handler_GetScenePrimaryKeys;
+    boost::function<SceneResourcePtr(const std::string&, const std::string)> handler_RegisterScene_UTF8;
+    boost::function<SceneResourcePtr(const std::wstring&, const std::string)> handler_RegisterScene_UTF16;
+    boost::function<SceneResourcePtr(const std::string&, const std::string, const std::string&, bool overwrite)> handler_ImportSceneToCOLLADA_UTF8;
+    boost::function<SceneResourcePtr(const std::wstring&, const std::string, const std::wstring&, bool overwrite)> handler_ImportSceneToCOLLADA_UTF16;
+    boost::function<void(const std::string&, const std::string&, const std::string&)> handler_SyncUpload_UTF8;
+    boost::function<void(const std::wstring&, const std::wstring&, const std::string&)> handler_SyncUpload_UTF16;
+    boost::function<void(const std::string&, const std::string&)> handler_UploadFileToController_UTF8;
+    boost::function<void(const std::wstring&, const std::wstring&)> handler_UploadFileToController_UTF16;
+    boost::function<void(const std::vector<unsigned char>&, const std::string&)> handler_UploadDataToController_UTF8;
+    boost::function<void(const std::vector<unsigned char>&, const std::wstring&)> handler_UploadDataToController_UTF16;
+    boost::function<void(const std::string&, const std::string&)> handler_UploadDirectoryToController_UTF8;
+    boost::function<void(const std::wstring&, const std::wstring&)> handler_UploadDirectoryToController_UTF16;
+    boost::function<void(const std::string&, std::vector<unsigned char>&)> handler_DownloadFileFromController_UTF8;
+    boost::function<void(const std::wstring&, std::vector<unsigned char>&)> handler_DownloadFileFromController_UTF16;
+    boost::function<void(const std::string&, long, long, std::vector<unsigned char>&, double)> handler_DownloadFileFromControllerIfModifiedSince_UTF8;
+    boost::function<void(const std::wstring&, long, long, std::vector<unsigned char>&, double)> handler_DownloadFileFromControllerIfModifiedSince_UTF16;
+    boost::function<void(const std::string&)> handler_DeleteFileOnController_UTF8;
+    boost::function<void(const std::wstring&)> handler_DeleteFileOnController_UTF16;
+    boost::function<void(const std::string&)> handler_DeleteDirectoryOnController_UTF8;
+    boost::function<void(const std::wstring&)> handler_DeleteDirectoryOnController_UTF16;
+    boost::function<void(const std::string&)> handler_SetDefaultSceneType;
+    boost::function<const std::string&()> handler_GetDefaultSceneType;
+    boost::function<void(const std::string&)> handler_SetDefaultTaskType;
+    boost::function<const std::string&()> handler_GetDefaultTaskType;
+    boost::function<std::string(const std::string&)> handler_GetScenePrimaryKeyFromURI_UTF8;
+    boost::function<std::string(const std::wstring&)> handler_GetScenePrimaryKeyFromURI_UTF16;
+    boost::function<std::string(const std::string&)> handler_GetPrimaryKeyFromName_UTF8;
+    boost::function<std::string(const std::wstring&)> handler_GetPrimaryKeyFromName_UTF16;
+    boost::function<std::string(const std::string&)> handler_GetNameFromPrimaryKey_UTF8;
+    boost::function<std::wstring(const std::string&)> handler_GetNameFromPrimaryKey_UTF16;
 };
 
-typedef boost::shared_ptr<ControllerClientMock> ControllerClientImplPtr;
+typedef boost::shared_ptr<ControllerClientMock> ControllerClientMockPtr;
+typedef boost::weak_ptr<ControllerClientMock> ControllerClientMockWeakPtr;
+
+ControllerClientMockPtr GetControllerClientMockPtr();
+ControllerClientMockWeakPtr GetControllerClientMockWeakPtr();
 
 } // end namespace mujinclient
 

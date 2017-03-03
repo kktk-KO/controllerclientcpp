@@ -22,17 +22,26 @@ MUJIN_LOGGER("mujin.testmujinvision.controllerclientmock");
 
 namespace mujinclient {
 
+
+static ControllerClientMockPtr controllerClientMockSingleton = ControllerClientMockPtr(new ControllerClientMock);
+
 ControllerClientPtr CreateControllerClient(const std::string& usernamepassword, const std::string& baseurl, const std::string& proxyserverport, const std::string& proxyuserpw, int options, double timeout)
 {
-  return ControllerClientPtr((ControllerClient *)(NULL));
+  controllerClientMockSingleton->ControllerClientConstructor(usernamepassword, baseurl, proxyserverport, proxyuserpw, options, timeout);
+  return controllerClientMockSingleton;
 }
 
-// ControllerClientWeakPtr GetControllerClientMock()
-// {
-//
-// }
+ControllerClientMockPtr GetControllerClientMockPtr()
+{
+  return controllerClientMockSingleton;
+}
 
-ControllerClientMock::ControllerClientMock(const std::string& usernamepassword, const std::string& baseuri, const std::string& proxyserverport, const std::string& proxyuserpw, int options, double timeout)
+ControllerClientMockWeakPtr GetControllerClientMockWeakPtr()
+{
+  return controllerClientMockSingleton;
+}
+
+ControllerClientMock::ControllerClientMock()
 {
 }
 
@@ -40,217 +49,209 @@ ControllerClientMock::~ControllerClientMock()
 {
 }
 
+void ControllerClientMock::ControllerClientConstructor(const std::string& usernamepassword, const std::string& baseurl, const std::string& proxyserverport, const std::string& proxyuserpw, int options, double timeout)
+{
+    return handler_ControllerClientConstructor(usernamepassword, baseurl, proxyserverport, proxyuserpw, options, timeout);
+}
+
 void ControllerClientMock::SetCharacterEncoding(const std::string& newencoding)
 {
-    assert(false);
+    return handler_SetCharacterEncoding(newencoding);
 }
 
 const std::string& ControllerClientMock::GetUserName() const
 {
-    assert(false);
-    return _dummy;
+    return handler_GetUserName();
 }
 
 void ControllerClientMock::SetLanguage(const std::string& language)
 {
-    assert(false);
+    return handler_SetLanguage(language);
 }
 
 void ControllerClientMock::SetProxy(const std::string& serverport, const std::string& userpw)
 {
-    assert(false);
+    return handler_SetProxy(serverport, userpw);
 }
 
 void ControllerClientMock::RestartServer(double timeout)
 {
-    assert(false);
+    return handler_RestartServer(timeout);
 }
 
 void ControllerClientMock::Upgrade(const std::vector<unsigned char>& vdata)
 {
+    return handler_Upgrade(vdata);
     assert(false);
 }
 
 std::string ControllerClientMock::GetVersion()
 {
-    assert(false);
-    return std::string("dummy");
+    return handler_GetVersion();
 }
 
 void ControllerClientMock::CancelAllJobs()
 {
-    assert(false);
+    return handler_CancelAllJobs();
 }
 
 void ControllerClientMock::GetRunTimeStatuses(std::vector<JobStatus>& statuses, int options)
 {
-    assert(false);
+    return handler_GetRunTimeStatuses(statuses, options);
 }
 
 void ControllerClientMock::GetScenePrimaryKeys(std::vector<std::string>& scenekeys)
 {
-    assert(false);
+    return handler_GetScenePrimaryKeys(scenekeys);
 }
 
 SceneResourcePtr ControllerClientMock::RegisterScene_UTF8(const std::string& uri, const std::string& scenetype)
 {
-    assert(false);
-    return SceneResourcePtr();
+    return handler_RegisterScene_UTF8(uri, scenetype);
 }
 
 SceneResourcePtr ControllerClientMock::RegisterScene_UTF16(const std::wstring& uri, const std::string& scenetype)
 {
-    assert(false);
-    return SceneResourcePtr();
+    return handler_RegisterScene_UTF16(uri, scenetype);
 }
 
 SceneResourcePtr ControllerClientMock::ImportSceneToCOLLADA_UTF8(const std::string& importuri, const std::string& importformat, const std::string& newuri, bool overwrite)
 {
-    assert(false);
-    return SceneResourcePtr();
+    return handler_ImportSceneToCOLLADA_UTF8(importuri, importformat, newuri, overwrite);
 }
 
 SceneResourcePtr ControllerClientMock::ImportSceneToCOLLADA_UTF16(const std::wstring& importuri, const std::string& importformat, const std::wstring& newuri, bool overwrite)
 {
-    assert(false);
-    return SceneResourcePtr();
+    return handler_ImportSceneToCOLLADA_UTF16(importuri, importformat, newuri, overwrite);
 }
 
-void ControllerClientMock::SyncUpload_UTF8(const std::string& _sourcefilename, const std::string& destinationdir, const std::string& scenetype)
+void ControllerClientMock::SyncUpload_UTF8(const std::string& sourcefilename, const std::string& destinationdir, const std::string& scenetype)
 {
-    assert(false);
+    return handler_SyncUpload_UTF8(sourcefilename, destinationdir, scenetype);
 }
 
-void ControllerClientMock::SyncUpload_UTF16(const std::wstring& _sourcefilename_utf16, const std::wstring& destinationdir_utf16, const std::string& scenetype)
+void ControllerClientMock::SyncUpload_UTF16(const std::wstring& sourcefilename_utf16, const std::wstring& destinationdir_utf16, const std::string& scenetype)
 {
-    assert(false);
+    return handler_SyncUpload_UTF16(sourcefilename_utf16, destinationdir_utf16, scenetype);
 }
 
 void ControllerClientMock::UploadFileToController_UTF8(const std::string& filename, const std::string& desturi)
 {
-    assert(false);
+    return handler_UploadFileToController_UTF8(filename, desturi);
 }
 void ControllerClientMock::UploadFileToController_UTF16(const std::wstring& filename, const std::wstring& desturi)
 {
-    assert(false);
+    return handler_UploadFileToController_UTF16(filename, desturi);
 }
 
 void ControllerClientMock::UploadDataToController_UTF8(const std::vector<unsigned char>& vdata, const std::string& desturi)
 {
-    assert(false);
+    return handler_UploadDataToController_UTF8(vdata, desturi);
 }
 
 void ControllerClientMock::UploadDataToController_UTF16(const std::vector<unsigned char>& vdata, const std::wstring& desturi)
 {
-    assert(false);
+    return handler_UploadDataToController_UTF16(vdata, desturi);
 }
 
 void ControllerClientMock::UploadDirectoryToController_UTF8(const std::string& copydir, const std::string& desturi)
 {
-    assert(false);
+    return handler_UploadDirectoryToController_UTF8(copydir, desturi);
 }
 
 void ControllerClientMock::UploadDirectoryToController_UTF16(const std::wstring& copydir, const std::wstring& desturi)
 {
-    assert(false);
+    return handler_UploadDirectoryToController_UTF16(copydir, desturi);
 }
 
 void ControllerClientMock::DownloadFileFromController_UTF8(const std::string& desturi, std::vector<unsigned char>& vdata)
 {
-    assert(false);
+    return handler_DownloadFileFromController_UTF8(desturi, vdata);
 }
 
 void ControllerClientMock::DownloadFileFromController_UTF16(const std::wstring& desturi, std::vector<unsigned char>& vdata)
 {
-    assert(false);
+    return handler_DownloadFileFromController_UTF16(desturi, vdata);
 }
 
 void ControllerClientMock::DownloadFileFromControllerIfModifiedSince_UTF8(const std::string& desturi, long localtimeval, long &remotetimeval, std::vector<unsigned char>& vdata, double timeout)
 {
-    assert(false);
+    return handler_DownloadFileFromControllerIfModifiedSince_UTF8(desturi, localtimeval, remotetimeval, vdata, timeout);
 }
 
 void ControllerClientMock::DownloadFileFromControllerIfModifiedSince_UTF16(const std::wstring& desturi, long localtimeval, long &remotetimeval, std::vector<unsigned char>& vdata, double timeout)
 {
-    assert(false);
+    return handler_DownloadFileFromControllerIfModifiedSince_UTF16(desturi, localtimeval, remotetimeval, vdata, timeout);
 }
 
 void ControllerClientMock::DeleteFileOnController_UTF8(const std::string& desturi)
 {
-    assert(false);
+    return handler_DeleteFileOnController_UTF8(desturi);
 }
 
 void ControllerClientMock::DeleteFileOnController_UTF16(const std::wstring& desturi)
 {
-    assert(false);
+    return handler_DeleteFileOnController_UTF16(desturi);
 }
 
 void ControllerClientMock::DeleteDirectoryOnController_UTF8(const std::string& desturi)
 {
-    assert(false);
+    return handler_DeleteDirectoryOnController_UTF8(desturi);
 }
 
 void ControllerClientMock::DeleteDirectoryOnController_UTF16(const std::wstring& desturi)
 {
-    assert(false);
+    return handler_DeleteDirectoryOnController_UTF16(desturi);
 }
 
 void ControllerClientMock::SetDefaultSceneType(const std::string& scenetype)
 {
-    assert(false);
+    return handler_SetDefaultSceneType(scenetype);
 }
 
 const std::string& ControllerClientMock::GetDefaultSceneType()
 {
-    assert(false);
-    return _dummy;
+    return handler_GetDefaultSceneType();
 }
 
 void ControllerClientMock::SetDefaultTaskType(const std::string& tasktype)
 {
-    assert(false);
+    return handler_SetDefaultTaskType(tasktype);
 }
 
 const std::string& ControllerClientMock::GetDefaultTaskType()
 {
-    assert(false);
-    return _dummy;
+    return handler_GetDefaultTaskType();
 }
 
 std::string ControllerClientMock::GetScenePrimaryKeyFromURI_UTF8(const std::string& uri)
 {
-    assert(false);
-    return std::string("dummy");
+    return handler_GetScenePrimaryKeyFromURI_UTF8(uri);
 }
 
 std::string ControllerClientMock::GetScenePrimaryKeyFromURI_UTF16(const std::wstring& uri)
 {
-    assert(false);
-    return std::string("dummy");
+    return handler_GetScenePrimaryKeyFromURI_UTF16(uri);
 }
 
 std::string ControllerClientMock::GetPrimaryKeyFromName_UTF8(const std::string& name)
 {
-    assert(false);
-    return std::string("dummy");
+    return handler_GetPrimaryKeyFromName_UTF8(name);
 }
 
 std::string ControllerClientMock::GetPrimaryKeyFromName_UTF16(const std::wstring& name)
 {
-    assert(false);
-    return std::string("dummy");
+    return handler_GetPrimaryKeyFromName_UTF16(name);
 }
 
 std::string ControllerClientMock::GetNameFromPrimaryKey_UTF8(const std::string& pk)
 {
-    assert(false);
-    return std::string("dummy");
+    return handler_GetNameFromPrimaryKey_UTF8(pk);
 }
 
 std::wstring ControllerClientMock::GetNameFromPrimaryKey_UTF16(const std::string& pk)
 {
-    assert(false);
-    return std::wstring(L"dummy");
+    return handler_GetNameFromPrimaryKey_UTF16(pk);
 }
 
-}
+} // namespace mujinclient
