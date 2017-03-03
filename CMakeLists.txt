@@ -303,9 +303,9 @@ add_subdirectory(src)
 if( OPT_SAMPLES )
   add_subdirectory(samples)
 endif()
-if( OPT_BUILD_TESTS )
+# if( OPT_BUILD_TESTS )
   add_subdirectory(test)
-endif()
+# endif()
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/share/mujincontrollerclient DESTINATION share)
 
